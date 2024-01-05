@@ -26,11 +26,9 @@ def check_version():
 def main():
     check_version()
     printl("info", "Checking config...")
-    #config = json.load(open("config.yml", "r"))
     config = yaml.safe_load((open("config.yml")))
     print(config["email_verify"]["m.kuku.lu_token"])
     print(config["email_verify"]["m.kuku.lu_sessionhash"])
-    #config = yaml.safe_load(open("config.yml"))
     #if config["captcha"]["key"] == '':
     #    console.error("No captcha key detected in config.yml")
     #    input("Press ENTER to exit.")
