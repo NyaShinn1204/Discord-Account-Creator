@@ -1,7 +1,7 @@
 # captcha Solver
 captcha_solver:
-    apikey: ""
     provider: "anti-captcha.com"  # Now only support anti-captcha.com
+    apikey: ""
 
 # Email Verify
 email_verify:
