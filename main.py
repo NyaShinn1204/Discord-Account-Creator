@@ -1,5 +1,6 @@
 import requests, yaml
 from colorama import Fore
+from modules.captcha_utilities import get_balance
 
 def printl(num, data):
   if num == "error":
@@ -40,6 +41,12 @@ def main():
         printl("error", "No captcha key detected")
         input("Press Enter to exit")
         exit(0)
+    printl("info", "Checking captcha apikey...")
+    if not float(get_balance(config["captcha_solver"]["provider"], config["captcha_solver"]["apikey"])) >= .1:
+        printl("error", "Your captcha account has less then 0.1$, Please charge your funds then try again.")
+        answer = input("(#) Continue anyway? (Y/N) >> ")
+        if answer.lower() == "n":
+            exit(0)
     #proxies = open("proxies.txt").read().splitlines()
     #if len(proxies) == 0:
     #    console.error("No proxies detected in proxies.txt")
