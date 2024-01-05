@@ -24,16 +24,21 @@ def check_version():
 def main():
     check_version()
     printl("info", "Checking config...")
-    config = yaml.safe_load((open("config.yml")))
+    try:
+        config = yaml.safe_load((open("config.yml")))
+    except:
+        printl("error", "WHY DO YOU DELETE CONFIG FILE????? WTF")
+        input("Press Enter to exit")
+        exit(0)
     print(config["email_verify"]["m.kuku.lu_token"])
     print(config["email_verify"]["m.kuku.lu_sessionhash"])
     if not config["captcha_solver"]["provider"] in ["anti-captcha.com"]:
         printl("error", f"Invalid captcha provider detected ({config['captcha_solver']['provider']})")
-        input("Press Enter to exit.")
+        input("Press Enter to exit")
         exit(0)
     if config["captcha_solver"]["apikey"] == '':
         printl("error", "No captcha key detected")
-        input("Press Enter to exit.")
+        input("Press Enter to exit")
         exit(0)
     #proxies = open("proxies.txt").read().splitlines()
     #if len(proxies) == 0:
