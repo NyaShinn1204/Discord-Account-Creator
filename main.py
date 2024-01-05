@@ -1,6 +1,6 @@
-import requests, yaml
+import requests, yaml, time
 from modules.captcha_utilities import get_balance
-from modules.console import printl
+from modules.console import printl, clear_screen
 
 def check_version():
   try:
@@ -41,12 +41,14 @@ def main():
         if answer.lower() == "n":
             exit(0)
     else:
-        printl("info", f"Now Solver Balance ${balance}")
-    #proxies = open("proxies.txt").read().splitlines()
-    #if len(proxies) == 0:
-    #    console.error("No proxies detected in proxies.txt")
-    #    input("Press ENTER to exit.")
-    #    exit(0)
+        printl("info", f"Solver Balance ${balance}")
+    proxies = open("proxies.txt").read().splitlines()
+    if len(proxies) == 0 or proxies.__contains__("username:password@ip:port"):
+        printl("error", "No proxies detected in proxies.txt")
+        input("Press ENTER to exit")
+        exit(0)
+    time.sleep(3)
+    clear_screen()
     #console.information("Checking captcha key...")
     #if not float(get_balance()) >= .1:
     #    console.error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
