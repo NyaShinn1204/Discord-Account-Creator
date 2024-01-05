@@ -1,12 +1,6 @@
 import requests, yaml
-from colorama import Fore
 from modules.captcha_utilities import get_balance
-
-def printl(num, data):
-  if num == "error":
-    print(f"[{Fore.LIGHTRED_EX}Error{Fore.RESET}] " + data)
-  if num == "info":
-    print(f"[{Fore.LIGHTGREEN_EX}Info{Fore.RESET}] " + data)
+from modules.console import printl
 
 def check_version():
   try:
@@ -40,11 +34,14 @@ def main():
         input("Press Enter to exit")
         exit(0)
     printl("info", "Checking captcha apikey...")
-    if not float(get_balance(config["captcha_solver"]["provider"], config["captcha_solver"]["apikey"])) >= .1:
+    balance = get_balance(config["captcha_solver"]["provider"], config["captcha_solver"]["apikey"])
+    if not float(balance) >= .1:
         printl("error", "Your captcha account has less then 0.1$, Please charge your funds then try again.")
         answer = input("(#) Continue anyway? (Y/N) >> ")
         if answer.lower() == "n":
             exit(0)
+    else:
+        printl("info", f"Now Solver Balance ${balance}")
     #proxies = open("proxies.txt").read().splitlines()
     #if len(proxies) == 0:
     #    console.error("No proxies detected in proxies.txt")

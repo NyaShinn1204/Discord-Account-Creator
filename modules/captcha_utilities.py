@@ -1,17 +1,17 @@
 import requests
+from modules.console import printl
 
 def get_balance(provider, apikey):
-    resp = requests.post("https://api.{}/getBalance".format(provider), json={"clientKey": apikey})
-    if resp.status_code == 200:
-        balance = resp.json()["balance"]
-        if balance == 0.0:
-            print(f"[+] Working Key: {apikey[:10]}***  But Balance 0.0$")
+    try:
+        resp = requests.post("https://api.{}/getBalance".format(provider), json={"clientKey": apikey})
+        if resp.status_code == 200:
+            return resp.json()["balance"]
+        elif "ERROR_KEY_DOES_NOT_EXIST" in resp.text:
+            printl("error", "Failed to get captcha balance")
+            return 0.0
         else:
-            print(f"[+] Working Key: {apikey[:10]}***  Balance: {balance}$")
-        return resp.json()["balance"]
-    elif "ERROR_KEY_DOES_NOT_EXIST" in resp.text:
-        print(f"[-] Invalid Key: {apikey[:10]}***")
-        return 0.0
-    else:
-        print(f"[-] Invalid Key Or Exception Error   Key: {apikey[:10]}*** Status Code: {resp.status_code}")
+            printl("error", "Failed to get captcha balance")
+            return 0.0
+    except:
+        printl("error", "Failed to get captcha balance")
         return 0.0
