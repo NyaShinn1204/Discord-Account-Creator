@@ -31,8 +31,6 @@ def main():
         printl("error", "WHY DO YOU DELETE CONFIG FILE????? WTF")
         input("Press Enter to exit")
         exit(0)
-    print(config["email_verify"]["m.kuku.lu_token"])
-    print(config["email_verify"]["m.kuku.lu_sessionhash"])
     if not config["captcha_solver"]["provider"] in ["anti-captcha.com"]:
         printl("error", f"Invalid captcha provider detected ({config['captcha_solver']['provider']})")
         input("Press Enter to exit")
