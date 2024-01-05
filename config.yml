@@ -1,0 +1,4 @@
+# Email Verify
+email_verify:
+    m.kuku.lu_token: "a"
+    m.kuku.lu_sessionhash: "a"
