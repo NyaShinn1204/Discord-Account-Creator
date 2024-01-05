@@ -19,17 +19,17 @@ def check_version():
 def format_proxy(data):
   # match_typeの初期設定
   match_type = None
-  # 1.1.1.1:1111のパターン
+  # ip:portのパターン
   ip_port_pattern = re.compile(r'(\d+\.\d+\.\d+\.\d+):(\d+)')
-  # username:pss@1.1.1.1:portのパターン
+  # username:password@ip:portのパターン
   user_pass_ip_port_pattern = re.compile(r'(\w+):(\w+)@(\d+\.\d+\.\d+\.\d+):(\w+)')
-  # 1.1.1.1:1111のパターンに一致するか確認
+  # ip:portのパターンに一致するか確認
   match1 = ip_port_pattern.match(data)
   if match1:
     match_type = 1
     ip, port = match1.groups()
     return match_type, ip, port
-  # username:pass@1.1.1.1:portのパターンに一致するか確認
+  # username:password@ip:portのパターンに一致するか確認
   match2 = user_pass_ip_port_pattern.match(data)
   if match2:
     match_type = 2
