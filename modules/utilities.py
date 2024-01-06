@@ -71,6 +71,7 @@ def get_fingerprint(session):
             return None
     except:
         printl("error", "Failed to get fingerprint, unknown error.")
+        return
 
 def get_username():
     uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
@@ -84,7 +85,21 @@ def get_username():
             get_username()
     except:
         printl("error", "Failed to get username, unknown error.")
+        return
 
+def get_globalname(): ## Sorry Skid 
+    try:
+        names = requests.post(
+            "https://www.spinxo.com/services/NameService.asmx/GetNames",
+            json={"snr":{"category":0,"UserName":"","Hobbies":"playing","ThingsILike":"","Numbers": "1,2,6,9,,,!,$,|","WhatAreYouLike":"gaming","Words":"","Stub":"username","LanguageCode":"en","NamesLanguageID":"45","Rhyming":False,"OneWord":True,"UseExactWords":False,"ScreenNameStyleString":"Any","GenderAny":True,"GenderMale":False,"GenderFemale":False}}
+        )
+        if names.status_code == 200:
+            name = random.choice(names.json()["d"]["Names"])
+            printl("info", f"Got Global Username {name}")
+            return name
+    except:
+        printl("error", "Failed to get global name, unknown error.")
+        return
 
 def format_proxy(data):
     # match_typeの初期設定

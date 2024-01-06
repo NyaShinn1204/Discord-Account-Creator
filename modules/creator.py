@@ -1,4 +1,4 @@
-from modules.utilities import get_session, get_cookies, get_fingerprint, get_username, format_proxy
+from modules.utilities import get_session, get_cookies, get_fingerprint, get_username, get_globalname, format_proxy
 from modules.console import printl
 
 def creator(proxie):
@@ -17,3 +17,4 @@ def creator(proxie):
     cookies = get_cookies(session)
     fingerprint = get_fingerprint(session)
     username = get_username()
+    global_name = get_globalname()
