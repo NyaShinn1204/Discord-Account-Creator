@@ -106,7 +106,9 @@ def creator(proxie):
     ##ここまで
     
     response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy=f"http://{proxie}", json=payload, cookies=cookies)
-    print(response.status_code, response.text)
+    if response.status_code == 429:
+        printl("error", "WTF??? RATELIMITED :skull:")
+    print(response.status_code, response.json())
     if response.status_code == 201:
         token = response.json()['token']
         printl("info", f"Success Create Account {email}:{password}:{token}")
@@ -117,12 +119,17 @@ def creator(proxie):
         if captcha_result:
             headers['X-Captcha-Key'] = captcha_result
             response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy=f"http://{proxie}", json=payload, cookies=cookies)
-            print(response.status_code, response.text)
+            #print(response.status_code, response.text)
             if response.status_code == 200 or response.status_code == 201:
                 token = response.json()['token']
-                printl("info", f"Success Create Account {email}:{password}:{token}")
-                headers['Authorization'] = token
-                headers.pop('X-Captcha-Key')
+                response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
+                if response.status_code == 403:
+                    printl("error", f"Lol Generate Locked Token {email}:{password}:{token}")
+                    return
+                elif response.status_code == 200:
+                    printl("info", f"Success Create Account {email}:{password}:{token}")
+                    headers['Authorization'] = token
+                    headers.pop('X-Captcha-Key')
             else:
                 return
         else:
