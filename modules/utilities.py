@@ -1,4 +1,4 @@
-import requests, re, tls_client
+import requests, re, tls_client, string, random
 from modules.console import printl
 
 
@@ -71,6 +71,20 @@ def get_fingerprint(session):
             return None
     except:
         printl("error", "Failed to get fingerprint, unknown error.")
+
+def get_username():
+    uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
+    try:
+        response = requests.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", json={"username": uncheck_username})
+        if response.json()["taken"] == False:
+            printl("info", f"Got Username {uncheck_username}")
+            return uncheck_username
+        else:
+            printl("error", "Regenerate the user name since it already exists.")
+            get_username()
+    except:
+        printl("error", "Failed to get username, unknown error.")
+
 
 def format_proxy(data):
     # match_typeの初期設定
