@@ -2,19 +2,7 @@ import random, yaml, time, threading
 from modules.utilities import check_version, format_proxy
 from modules.captcha_utilities import get_balance
 from modules.console import printl, clear_screen
-
-def test(proxie):
-    formated_proxy = format_proxy(proxie)
-    if formated_proxy[0] == 1:
-        host = formated_proxy[1]
-        port = formated_proxy[2]
-        printl("info", f"Running on {host[:7] + '*' * (len(host) - 7)}:{port}")
-    if formated_proxy[0] == 2:
-        username = formated_proxy[1]
-        password = formated_proxy[2]
-        host = formated_proxy[3]
-        port = formated_proxy[4]
-        printl("info", f"Running Proxie on {host[:7] + '*' * (len(host) - 7)}:{port} | {username[:3] + '*' * (len(username) - 3)}:{password[:3] + '*' * (len(password) - 3)}")
+from modules.creator import creator 
 
 def main():
     check_version()
@@ -41,7 +29,7 @@ def main():
         if answer.lower() == "n":
             exit(0)
     else:
-        printl("info", f"Solver Balance ${balance}")
+        printl("info", f"Solver Service Balance ${balance}")
     proxies = open("proxies.txt").read().splitlines()
     if len(proxies) == 0 or proxies.__contains__("username:password@ip:port"):
         printl("error", "No proxies detected in proxies.txt")
@@ -50,7 +38,7 @@ def main():
     time.sleep(3)
     clear_screen()
     proxie = random.choice(proxies)
-    threading.Thread(target=test, args=(proxie,)).start()
+    threading.Thread(target=creator, args=(proxie,)).start()
     #console.information("Checking captcha key...")
     #if not float(get_balance()) >= .1:
     #    console.error("Your captcha account has less then 0.1$, Please charge your funds then try again.")
