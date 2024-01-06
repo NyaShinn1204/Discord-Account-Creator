@@ -1,0 +1,14 @@
+# captcha Solver
+captcha_solver:
+    provider: "anti-captcha.com"  # Now only support anti-captcha.com
+    apikey: ""
+
+# Register
+register:
+    global_username: "" # Empty to random
+
+# Email Verify
+email_verify:
+    enable: True
+    m.kuku.lu_token: "a"
+    m.kuku.lu_sessionhash: "a"
