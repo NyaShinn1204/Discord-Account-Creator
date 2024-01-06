@@ -134,7 +134,7 @@ def creator(proxie):
         poipoi_session.cookies.set('cookie_csrf_token', config["email_verify"]["m.kuku.lu_token"])
         poipoi_session.cookies.set('cookie_sessionhash', config["email_verify"]["m.kuku.lu_sessionhash"])
         while True:
-            response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} メールアドレスを確認してください&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
+            response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} Verify Email Address for Discord&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
             soup = BeautifulSoup(response.text, 'html.parser')
             if soup.find('span', attrs={'class':'view_listcnt'}).contents[0] == '1':
                 break
