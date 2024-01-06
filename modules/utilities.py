@@ -85,6 +85,9 @@ def get_username():
     uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
     try:
         response = requests.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", json={"username": uncheck_username})
+        if response.status_code == 429:
+            printl("error", "Rate limitation has now occurred on the request to check user name. Skip check.")
+            return uncheck_username
         if response.json()["taken"] == False:
             printl("info", f"Got Username {uncheck_username}")
             return uncheck_username
