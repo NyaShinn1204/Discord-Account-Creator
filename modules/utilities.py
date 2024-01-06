@@ -7,7 +7,7 @@ def check_version():
         printl("info", "Checking version...")
         # githubからデータを取得
         get_version = requests.get(
-            "https://raw.githubusercontent.com/NyaShinn1204/Discord-Account-Creator/dev-v0.0.1/version"
+            "https://raw.githubusercontent.com/NyaShinn1204/Discord-Account-Creator/main/version"
         ).text.split("\n")[0]
         now_version = open("version", "r").read().splitlines()[0]
         # デバイスとオンライン上と照合
