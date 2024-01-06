@@ -73,6 +73,14 @@ def get_fingerprint(session):
         printl("error", "Failed to get fingerprint, unknown error.")
         return
 
+def get_buildnum(session):
+    text = session.get("https://discord.com/login").text 
+    script_url = 'https://discord.com/assets/' + re.compile(r'\d+\.\w+\.js|sentry\.\w+\.js').findall(text)[-1]
+    text = session.get(script_url).text
+    index = text.find("buildNumber") + 26
+    build_num = int(text[index:index + 6])
+    return build_num
+
 def get_username():
     uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
     try:
@@ -100,6 +108,24 @@ def get_globalname(): ## Sorry Skid
     except:
         printl("error", "Failed to get global name, unknown error.")
         return
+
+def get_email(token, sessionhash):
+    def remove_string(string:str, remove):
+        if type(remove) == str:
+            string = string.replace(remove, '')
+        elif type(remove) == list:
+            for remove_string in remove:
+                string = string.replace(remove_string, '')
+        return string
+    poipoi_session = requests.session()
+    poipoi_session.cookies.set('cookie_csrf_token', token)
+    poipoi_session.cookies.set('cookie_sessionhash', sessionhash)
+    response = poipoi_session.get(f'https://m.kuku.lu/index.php?action=addMailAddrByManual&by_system=1&csrf_token_check={token}&newdomain=cocoro.uk&newuser=')
+    email = remove_string(response.text, 'OK:')
+    return email
+
+def get_password():
+    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(15, 20))) 
 
 def format_proxy(data):
     # match_typeの初期設定

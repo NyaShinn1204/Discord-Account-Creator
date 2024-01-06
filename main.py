@@ -8,7 +8,7 @@ def main():
     check_version()
     printl("info", "Checking config...")
     try:
-        config = yaml.safe_load((open("config.yml")))
+        config = yaml.safe_load((open("config.yml", encoding="utf-8")))
     except:
         printl("error", "WHY DO YOU DELETE CONFIG FILE????? WTF")
         input("Press Enter to exit")
