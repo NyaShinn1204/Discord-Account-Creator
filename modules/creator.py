@@ -19,6 +19,19 @@ def creator(proxie):
         proxy_port = formated_proxy[4]
         convert_proxie = f"{proxy_host[:7] + '*' * (len(proxy_host) - 7)}:{proxy_port} | {proxy_username[:3] + '*' * (len(proxy_username) - 3)}:{proxy_password[:3] + '*' * (len(proxy_password) - 3)}"
     printl("info", f"Running Proxie of {convert_proxie}")
+    try:
+        start = time.time()
+        response = requests.get("http://example.com", proxies={"http" : f"http://{proxie}"})
+        end = time.time()
+        time_elapsed = end - start
+        time_elapsed = time_elapsed * 1000
+        printl("info", f"{convert_proxie} - Working {round(time_elapsed)}ms")
+    except IOError:
+        printl("error", f"Connection error of {convert_proxie}")
+        return
+    except Exception as error:
+        printl("error", f"Failed Check Proxies of {convert_proxie}")
+        return
     session = get_session()
     cookies = get_cookies(session)
     fingerprint = get_fingerprint(session)
@@ -106,7 +119,7 @@ def creator(proxie):
     }
     ##ここまで
     
-    response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy=f"http://{proxie}", json=payload, cookies=cookies)
+    response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxies={"http" : f"http://{proxie}"}, json=payload, cookies=cookies)
     if response.status_code == 429:
         printl("error", "WTF??? RATELIMITED :skull:")
     print(response.status_code, response.json())
@@ -119,7 +132,7 @@ def creator(proxie):
         captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/register", proxy_host, proxy_port, proxy_username, proxy_password)
         if captcha_result:
             headers['X-Captcha-Key'] = captcha_result
-            response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy=f"http://{proxie}", json=payload, cookies=cookies)
+            response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxies={"http" : f"http://{proxie}"}, json=payload, cookies=cookies)
             if response.status_code == 200 or response.status_code == 201:
                 token = response.json()['token']
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
