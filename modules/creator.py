@@ -125,7 +125,7 @@ def creator(proxie):
                 if response.status_code == 403:
                     printl(response.json())
                     printl("error", f"Generate Locked Token {email}:{password}:{token}")
-                    if response.json()["message"] == "You need to verify your account in order to perform this action." and response.json()["code"] == 40002:
+                    if response.json()["message"] == "You need to verify your account in order to perform this action." or response.json()["code"] == 40002:
                         printl("error", f"Phone Verify Requirement ⚠")
                     return
                 elif response.status_code == 200:
