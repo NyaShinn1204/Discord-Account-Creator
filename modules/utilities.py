@@ -81,10 +81,10 @@ def get_buildnum(session):
     build_num = int(text[index:index + 6])
     return build_num
 
-def get_username():
+def get_username(session):
     uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
     try:
-        response = requests.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", json={"username": uncheck_username})
+        response = session.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", json={"username": uncheck_username})
         if response.status_code == 429:
             printl("error", "Rate limitation has now occurred on the request to check user name. Skip check.")
             return uncheck_username
@@ -98,9 +98,9 @@ def get_username():
         printl("error", "Failed to get username, unknown error.")
         return
 
-def get_globalname(): ## Sorry Skid 
+def get_globalname(session): ## Sorry Skid 
     try:
-        names = requests.post(
+        names = session.post(
             "https://www.spinxo.com/services/NameService.asmx/GetNames",
             json={"snr":{"category":0,"UserName":"","Hobbies":"playing","ThingsILike":"","Numbers": "1,2,6,9,,,!,$,|","WhatAreYouLike":"gaming","Words":"","Stub":"username","LanguageCode":"en","NamesLanguageID":"45","Rhyming":False,"OneWord":True,"UseExactWords":False,"ScreenNameStyleString":"Any","GenderAny":True,"GenderMale":False,"GenderFemale":False}}
         )

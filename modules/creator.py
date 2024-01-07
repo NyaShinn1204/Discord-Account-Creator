@@ -21,12 +21,12 @@ def creator(proxie):
     session = get_session()
     cookies = get_cookies(session)
     fingerprint = get_fingerprint(session)
-    username = get_username()
+    username = get_username(session)
     if not config["register"]["global_username"] == '':
         global_name = config["register"]["global_username"]
         printl("info", f"Got Global Username {global_name}")
     else:
-        global_name = get_globalname()
+        global_name = get_globalname(session)
     if config["email_verify"]["enable"] == True:
         email = get_email(config["email_verify"]["m.kuku.lu_token"], config["email_verify"]["m.kuku.lu_sessionhash"])
         if email == "":
@@ -119,7 +119,6 @@ def creator(proxie):
         if captcha_result:
             headers['X-Captcha-Key'] = captcha_result
             response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy=f"http://{proxie}", json=payload, cookies=cookies)
-            #print(response.status_code, response.text)
             if response.status_code == 200 or response.status_code == 201:
                 token = response.json()['token']
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
