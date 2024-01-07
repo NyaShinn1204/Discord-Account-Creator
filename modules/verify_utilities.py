@@ -1,9 +1,9 @@
 import requests, time, yaml, re, random
 from modules.utilities import get_session
 from modules.captcha_utilities import solve_captcha
+from modules.phone_utilities import fivesim
 from modules.console import printl
 from bs4 import BeautifulSoup
-
 
 config = yaml.safe_load((open("config.yml", encoding="utf-8")))
 
@@ -65,29 +65,96 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
             return
         
 #Phone Verify
-def verify_phone(phone_headers, proxie, proxy_host, proxy_port, proxy_username, proxy_password):
+def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password):
     session = get_session()
-    NUMBER = f"81090{random.randint(10000000, 99999999)}"
-    payload = {"captcha_key": None, "change_phone_reason": "user_settings_update", "phone": NUMBER}
-    response = session.post(
+    
+
+    if config["phone_verify"]["provider"] == "fivesim":
+        NUMBER, TZID = fivesim.ordernumber()
+    NUMBER = f"+{NUMBER}"
+    
+    data1 = {"captcha_key": None, "change_phone_reason": "user_settings_update", "phone": NUMBER}
+    resp2 = session.post(
         url="https://discord.com/api/v9/users/@me/phone",
-        json=payload,
+        json=data1,
         headers=phone_headers,
         proxy={"http":f"http://{proxie}"}
     )
-    if "captcha_key" in response.json():
-        if response.json()["captcha_key"] == ["You need to update your app to verify your phone number."]:
-            
+
+    if "captcha_key" in resp2.json():
+        if resp2.json()["captcha_key"] == ["You need to update your app to verify your phone number."]:
             printl("info", "Captcha Solving...")
             
-            captcha_sitekey = response.json()["captcha_sitekey"]
-            captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/register", proxy_host, proxy_port, proxy_username, proxy_password)
+            captcha_sitekey = resp2.json()["captcha_sitekey"]
+            data1["captcha_key"] = solve_captcha(captcha_sitekey, "https://discord.com/api/v9/users/@me/phone", proxy_host, proxy_port, proxy_username, proxy_password)
 
-            phone_headers['X-Captcha-Key'] = captcha_result
 
-            response = session.post(
+            resp2 = session.post(
                 url="https://discord.com/api/v9/users/@me/phone",
-                json=payload,
+                json=data1,
                 headers=phone_headers,
                 proxy={"http":f"http://{proxie}"}
             )
+    else:
+        printl("info", "No Captcha Solving required... Skipping!")
+
+    if resp2.status_code == 204:
+        printl("info", "Successfully requested verification code!")
+        
+    def waitsms():
+        waitcount = 0
+        retries = 0
+        if config["phone_verify"]["provider"] == "fivesim":
+            waitcount, verifycode = fivesim.getcode()
+
+        if waitcount == "TIMEOUT":
+            retries += 1
+            if retries >= 5:
+                printl("error", "Failed to get SMS code after 5 retries, switching token!")
+                #removetoken()
+
+                if config["phone_verify"]["provider"] == "fivesim":
+                    waitcount, verifycode = fivesim.deletenumber()
+                    
+                verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
+
+            else:
+                printl("error", f"Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...")
+                
+                if config["phone_verify"]["provider"] == "fivesim":
+                    waitcount, verifycode = fivesim.deletenumber()
+                    
+                verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
+
+        return verifycode
+    VERIFYCODE = waitsms()
+
+    if VERIFYCODE is not None:
+        printl("info", "Found Verificationcode: {VERIFYCODE}, sending it to Discord...")
+        data2 = {"phone": NUMBER, "code": VERIFYCODE}
+
+        resp4 = session.post(
+            url="https://discord.com/api/v9/phone-verifications/verify",
+            json=data2,
+            headers=phone_headers,
+            proxy={"http":f"http://{proxie}"}
+        ).json()
+        try: phone_token = resp4["token"]
+        except KeyError: phone_token = None
+
+
+
+        data3 = {"change_phone_reason": "user_settings_update", "password": password, "phone_token": phone_token}
+        session.post(
+            url="https://discord.com/api/v9/users/@me/phone",
+            json=data3,
+            headers=phone_headers,
+            proxy={"http":f"http://{proxie}"}
+        )
+
+        printl("info", f'Successfully verified {phone_headers["authorization"]} with {NUMBER}!')
+
+    elif VERIFYCODE is None:
+        printl("error", "Failed to get verification code! Rerunning...")
+        #removetoken()
+        verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
