@@ -1,7 +1,7 @@
 import yaml, random, base64, json, string, requests, time, re
 from modules.utilities import get_session, get_cookies, get_fingerprint, get_buildnum, get_username, get_globalname, get_email, get_password, format_proxy
 from modules.captcha_utilities import solve_captcha
-from modules.verify_utilities import verify_email
+from modules.verify_utilities import verify_email, verify_phone
 from modules.console import printl
 from modules.random_agent import random_agent
 
@@ -185,3 +185,7 @@ def creator(proxie):
     #Email Verify
     if config["email_verify"]["enable"] == True:
         verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
+        
+    #Phone Verify
+    if config["phone_verify"]["enable"] == True:
+        verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
