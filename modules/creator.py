@@ -119,7 +119,7 @@ def creator(proxie):
     }
     ##ここまで
     
-    response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxies={"http" : f"http://{proxie}"}, json=payload, cookies=cookies)
+    response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
     if response.status_code == 429:
         printl("error", "WTF??? RATELIMITED :skull:")
     print(response.status_code, response.json())
@@ -132,7 +132,7 @@ def creator(proxie):
         captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/register", proxy_host, proxy_port, proxy_username, proxy_password)
         if captcha_result:
             headers['X-Captcha-Key'] = captcha_result
-            response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxies={"http" : f"http://{proxie}"}, json=payload, cookies=cookies)
+            response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
             if response.status_code == 200 or response.status_code == 201:
                 token = response.json()['token']
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})

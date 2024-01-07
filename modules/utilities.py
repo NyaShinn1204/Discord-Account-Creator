@@ -98,7 +98,7 @@ def get_username(session):
         printl("error", "Failed to get username, unknown error.")
         return
 
-def get_globalname(session): ## Sorry Skid 
+def get_globalname(session): # Sorry Skid 
     try:
         names = session.post(
             "https://www.spinxo.com/services/NameService.asmx/GetNames",
