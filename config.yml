@@ -16,3 +16,6 @@ email_verify:
 # Phone Verify  Coming Soon
 phone_verify:
     enable: None
+    provider: "5sim.net"  # Now only support 5sim.net
+    apikey: ""
+    country: "russia"
