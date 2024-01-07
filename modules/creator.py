@@ -1,9 +1,9 @@
 import yaml, random, base64, json, string, requests, time, re
 from modules.utilities import get_session, get_cookies, get_fingerprint, get_buildnum, get_username, get_globalname, get_email, get_password, format_proxy
 from modules.captcha_utilities import solve_captcha
+from modules.verify_utilities import verify_email
 from modules.console import printl
 from modules.random_agent import random_agent
-from bs4 import BeautifulSoup
 
 def creator(proxie):
     config = yaml.safe_load((open("config.yml", encoding="utf-8")))
@@ -52,8 +52,8 @@ def creator(proxie):
         email = f"{''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(15)))}@gmail.com" 
     password = get_password()
 
-    # Headers
-    ##ここから
+
+    # 初期設定Headers
     agent_string = random_agent()
     buildnum = get_buildnum(session)
     browser_data = agent_string.split(" ")[-1].split("/")
@@ -81,6 +81,9 @@ def creator(proxie):
         "client_build_number": buildnum,
         "client_event_source": None
     }
+    
+    # Normal Headers
+    ##ここから
     headers = {
         "Accept":"*/*",
         "Accept-Encoding": "gzip, deflate, br",
@@ -102,6 +105,29 @@ def creator(proxie):
         "X-Debug-Options": "bugReporterEnabled"
     }
     ##ここまで
+    
+    #Phone Verify Headers
+    ##ここから
+    phone_headers = {
+        "accept": "*/*",
+        "accept-encoding": "gzip, deflate, br",
+        "accept-language": "en-US,en;q=0.9",
+        "authorization": token,
+        "content-type": "application/json",
+        "origin": "https://discord.com",
+        "referer": "https://discord.com/channels/@me",
+        "sec-ch-ua": '" Not A;Brand";v="99", "Chromium";v="108", "Google Chrome";v="108"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "Windows",
+        "sec-fetch-dest": "empty",
+        "sec-fetch-mode": "cors",
+        "sec-fetch-site": "same-origin",
+        "user-agent": agent_string,
+        "X-Super-Properties": base64.b64encode(json.dumps(device_info).encode('utf-8')).decode("utf-8"),
+        "X-Debug-Options": "bugReporterEnabled"
+    }
+    ##ここまで
+    
     
     # Payload
     ##ここから
@@ -157,62 +183,5 @@ def creator(proxie):
         printl("error", f"Failed to Response Register {response.json()}")
     
     #Email Verify
-    ##ここから
-    
-    ## 注意: メールを既読してしまうと取得ができてもurlが取得できません
-    
     if config["email_verify"]["enable"] == True:
-        poipoi_session = requests.session()
-        # poipoi_sessionの初期設定
-        poipoi_session.cookies.set('cookie_csrf_token', config["email_verify"]["m.kuku.lu_token"])
-        poipoi_session.cookies.set('cookie_sessionhash', config["email_verify"]["m.kuku.lu_sessionhash"])
-        # 未読の指定したメールが来るまで2秒間隔で検索を繰り返す
-        while True:
-            response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} Verify Email Address for Discord&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
-            soup = BeautifulSoup(response.text, 'html.parser')
-            if soup.find('span', attrs={'class':'view_listcnt'}).contents[0] == '1':
-                break
-            time.sleep(2)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        mail_element = soup.find('div', attrs={'class':'main-content'}).find('div', attrs={'style':'z-index:99;'})
-        script_element = mail_element.parent.find_all('script')[2]
-        parsed_javascript = re.findall(r'\'.*\'', script_element.string)
-        num = parsed_javascript[1].split(',')[0].replace('\'', '')
-        key = parsed_javascript[1].split(',')[1].replace('\'', '').replace(' ', '')
-
-        response = poipoi_session.post('https://m.kuku.lu/smphone.app.recv.view.php', data={'num':num, 'key':key})
-        soup = BeautifulSoup(response.text, 'html.parser')
-        verify_redirect_url = soup.find('a', text='\n            Verify Email\n          ').attrs['href']
-        response = requests.get(verify_redirect_url, headers=headers, proxies=f"http://{proxie}")
-        soup = BeautifulSoup(response.text, 'html.parser')
-        script_element = soup.find('script')
-        # verify_urlの取得
-        verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
-        response = requests.get(verify_url, headers=headers, proxies=f"http://{proxie}")
-        verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
-        request_data = {"token": verify_token}
-        # Emailの認証
-        response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies=f"http://{proxie}", json=request_data)
-        if response.status_code == 200:
-            token = response.json()['token']
-            printl("info", f"Email Verifed {email}:{password}:{token}")
-            headers['Authorization'] = token
-        elif response.status_code == 400:
-            if 'captcha_sitekey' in response.json().keys():
-                captcha_sitekey = response.json()['captcha_sitekey']
-                captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/verify", proxy_host, proxy_port, proxy_username, proxy_password)
-                if captcha_result:
-                    headers['X-Captcha-Key'] = captcha_result
-                    response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies=f"http://{proxie}")
-                    if response.status_code == 200 or response.status_code == 201:
-                        printl("info", f"Email Verifed {email}:{password}:{token}")
-                        token = response.json()['token']
-                        headers['Authorization'] = token
-                        headers.pop('X-Captcha-Key')
-                    else:
-                        return
-                else:
-                    return
-            else:
-                return
-    ##ここまで
+        verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
