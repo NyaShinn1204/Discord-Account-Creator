@@ -11,13 +11,14 @@ def creator(proxie):
     if formated_proxy[0] == 1:
         proxy_host = formated_proxy[1]
         proxy_port = formated_proxy[2]
-        printl("info", f"Running on {proxy_host[:7] + '*' * (len(proxy_host) - 7)}:{proxy_port}")
+        convert_proxie = f"{proxy_host[:7] + '*' * (len(proxy_host) - 7)}:{proxy_port}"
     if formated_proxy[0] == 2:
         proxy_username = formated_proxy[1]
         proxy_password = formated_proxy[2]
         proxy_host = formated_proxy[3]
         proxy_port = formated_proxy[4]
-        printl("info", f"Running Proxie of {proxy_host[:7] + '*' * (len(proxy_host) - 7)}:{proxy_port} | {proxy_username[:3] + '*' * (len(proxy_username) - 3)}:{proxy_password[:3] + '*' * (len(proxy_password) - 3)}")
+        convert_proxie = f"{proxy_host[:7] + '*' * (len(proxy_host) - 7)}:{proxy_port} | {proxy_username[:3] + '*' * (len(proxy_username) - 3)}:{proxy_password[:3] + '*' * (len(proxy_password) - 3)}"
+    printl("info", f"Running Proxie of {convert_proxie}")
     session = get_session()
     cookies = get_cookies(session)
     fingerprint = get_fingerprint(session)
@@ -123,10 +124,11 @@ def creator(proxie):
                 token = response.json()['token']
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
                 if response.status_code == 403:
-                    printl(response.json())
                     printl("error", f"Generate Locked Token {email}:{password}:{token}")
-                    if response.json()["message"] == "You need to verify your account in order to perform this action." or response.json()["code"] == 40002:
-                        printl("error", f"Phone Verify Requirement ⚠")
+                    if response.json()["message"] == "You need to verify your account in order to perform this action." and response.json()["code"] == 40002:
+                        printl("error", f"Phone Verify Requirement")
+                    else:
+                        printl("error", f"Reason {response.json()}")
                     return
                 elif response.status_code == 200:
                     printl("info", f"Generate UnLocked Token {email}:{password}:{token}")
@@ -166,10 +168,10 @@ def creator(proxie):
         verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
         request_data = {"token": verify_token}
         response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies=f"http://{proxie}", json=request_data)
-        print(response.status_code, response.text)
+        #print(response.status_code, response.text)
         if response.status_code == 200:
             token = response.json()['token']
-            print(f'[Email Verified] {email}:{password}:{token}')
+            printl("info", f"Email Verifed {email}:{password}:{token}")
             headers['Authorization'] = token
         elif response.status_code == 400:
             if 'captcha_sitekey' in response.json().keys():
@@ -178,9 +180,9 @@ def creator(proxie):
                 if captcha_result:
                     headers['X-Captcha-Key'] = captcha_result
                     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies=f"http://{proxie}")
-                    print(response.status_code, response.text)
+                    #print(response.status_code, response.text)
                     if response.status_code == 200 or response.status_code == 201:
-                        print(f'[Email Verified] {email}:{password}:{token}')
+                        printl("info", f"Email Verifed {email}:{password}:{token}")
                         token = response.json()['token']
                         headers['Authorization'] = token
                         headers.pop('X-Captcha-Key')
