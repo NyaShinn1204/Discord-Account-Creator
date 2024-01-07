@@ -106,7 +106,7 @@ def creator(proxie):
     }
     ##ここまで
     
-    #Phone Verify Headers
+    # Phone Verify Headers
     ##ここから
     phone_headers = {
         "accept": "*/*",
@@ -127,7 +127,6 @@ def creator(proxie):
         "X-Debug-Options": "bugReporterEnabled"
     }
     ##ここまで
-    
     
     # Payload
     ##ここから

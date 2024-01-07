@@ -66,9 +66,9 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
         
 #Phone Verify
 def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password):
+    
     session = get_session()
     
-
     if config["phone_verify"]["provider"] == "fivesim":
         NUMBER, TZID = fivesim.ordernumber()
     NUMBER = f"+{NUMBER}"
@@ -101,11 +101,11 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
     if resp2.status_code == 204:
         printl("info", "Successfully requested verification code!")
         
-    def waitsms():
+    def waitsms(NUMBER, TZID, phone_headers):
         waitcount = 0
         retries = 0
         if config["phone_verify"]["provider"] == "fivesim":
-            waitcount, verifycode = fivesim.getcode()
+            waitcount, verifycode = fivesim.getcode(NUMBER, TZID)
 
         if waitcount == "TIMEOUT":
             retries += 1
@@ -114,7 +114,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
                 #removetoken()
 
                 if config["phone_verify"]["provider"] == "fivesim":
-                    waitcount, verifycode = fivesim.deletenumber()
+                    waitcount, verifycode = fivesim.deletenumber(TZID, phone_headers)
                     
                 verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
 
@@ -122,12 +122,12 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
                 printl("error", f"Discord refused to send a SMS to {NUMBER}! Rerunning with another Number...")
                 
                 if config["phone_verify"]["provider"] == "fivesim":
-                    waitcount, verifycode = fivesim.deletenumber()
+                    waitcount, verifycode = fivesim.deletenumber(TZID, phone_headers)
                     
                 verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
 
         return verifycode
-    VERIFYCODE = waitsms()
+    VERIFYCODE = waitsms(NUMBER, TZID, phone_headers)
 
     if VERIFYCODE is not None:
         printl("info", "Found Verificationcode: {VERIFYCODE}, sending it to Discord...")
