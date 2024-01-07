@@ -12,3 +12,7 @@ email_verify:
     enable: True
     m.kuku.lu_token: "a"
     m.kuku.lu_sessionhash: "a"
+
+# Phone Verify  Coming Soon
+phone_verify:
+    enable: None

@@ -147,6 +147,8 @@ def creator(proxie):
                     printl("info", f"Generate UnLocked Token {email}:{password}:{token}")
                     headers['Authorization'] = token
                     headers.pop('X-Captcha-Key')
+                else:
+                    printl("error", "LOL FAILED TO GENERATE ACCOUNT")
             else:
                 return
         else:
