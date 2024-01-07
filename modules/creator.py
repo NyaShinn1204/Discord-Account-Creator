@@ -123,10 +123,13 @@ def creator(proxie):
                 token = response.json()['token']
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
                 if response.status_code == 403:
-                    printl("error", f"Lol Generate Locked Token {email}:{password}:{token}")
+                    printl(response.json())
+                    printl("error", f"Generate Locked Token {email}:{password}:{token}")
+                    if response.json()["message"] == "You need to verify your account in order to perform this action." and response.json()["code"] == 40002:
+                        printl("error", f"Phone Verify Requirement ⚠")
                     return
                 elif response.status_code == 200:
-                    printl("info", f"Success Create Account {email}:{password}:{token}")
+                    printl("info", f"Generate UnLocked Token {email}:{password}:{token}")
                     headers['Authorization'] = token
                     headers.pop('X-Captcha-Key')
             else:
