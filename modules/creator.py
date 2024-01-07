@@ -137,8 +137,9 @@ def creator(proxie):
             else:
                 return
         else:
-            return
-        
+            return 
+    else:
+        printl("error", f"Failed to Response Register {response.json()}")
         
     if config["email_verify"]["enable"] == True:
         poipoi_session = requests.session()
