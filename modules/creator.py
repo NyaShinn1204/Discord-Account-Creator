@@ -29,7 +29,7 @@ def creator(proxie):
     except IOError:
         printl("error", f"Connection error of {convert_proxie}")
         return
-    except Exception as error:
+    except:
         printl("error", f"Failed Check Proxies of {convert_proxie}")
         return
     session = get_session()
@@ -153,11 +153,18 @@ def creator(proxie):
             return 
     else:
         printl("error", f"Failed to Response Register {response.json()}")
-        
+    
+    #Email Verify
+    ##ここから
+    
+    ## 注意: メールを既読してしまうと取得ができてもurlが取得できません
+    
     if config["email_verify"]["enable"] == True:
         poipoi_session = requests.session()
+        # poipoi_sessionの初期設定
         poipoi_session.cookies.set('cookie_csrf_token', config["email_verify"]["m.kuku.lu_token"])
         poipoi_session.cookies.set('cookie_sessionhash', config["email_verify"]["m.kuku.lu_sessionhash"])
+        # 未読の指定したメールが来るまで2秒間隔で検索を繰り返す
         while True:
             response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} Verify Email Address for Discord&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
             soup = BeautifulSoup(response.text, 'html.parser')
@@ -177,12 +184,13 @@ def creator(proxie):
         response = requests.get(verify_redirect_url, headers=headers, proxies=f"http://{proxie}")
         soup = BeautifulSoup(response.text, 'html.parser')
         script_element = soup.find('script')
+        # verify_urlの取得
         verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
         response = requests.get(verify_url, headers=headers, proxies=f"http://{proxie}")
         verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
         request_data = {"token": verify_token}
+        # Emailの認証
         response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies=f"http://{proxie}", json=request_data)
-        #print(response.status_code, response.text)
         if response.status_code == 200:
             token = response.json()['token']
             printl("info", f"Email Verifed {email}:{password}:{token}")
@@ -194,7 +202,6 @@ def creator(proxie):
                 if captcha_result:
                     headers['X-Captcha-Key'] = captcha_result
                     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies=f"http://{proxie}")
-                    #print(response.status_code, response.text)
                     if response.status_code == 200 or response.status_code == 201:
                         printl("info", f"Email Verifed {email}:{password}:{token}")
                         token = response.json()['token']
@@ -206,3 +213,4 @@ def creator(proxie):
                     return
             else:
                 return
+    ##ここまで
