@@ -48,7 +48,7 @@ class fivesim:
                     time.sleep(int(ratelimit_duration))
 
             if waitcount % 5 == 0: # run every x time to request a new sms from discord
-                data = {"phone": NUMBER, "change_phone_reason": "user_settings_update"}
+                data = {"phone": NUMBER, "change_phone_reason": "user_action_required"}
 
                 discordresponse = session.post(
                     url=discordurl,
