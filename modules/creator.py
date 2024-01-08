@@ -33,9 +33,9 @@ def creator(proxie):
         printl("error", f"Failed Check Proxies of {convert_proxie}")
         return
     session = get_session()
-    cookies = get_cookies(session)
+    cookies = get_cookies(session, proxie)
     fingerprint = get_fingerprint(session)
-    username = get_username(session)
+    username = get_username(session, proxie)
     if not config["register"]["global_username"] == '':
         global_name = config["register"]["global_username"]
         printl("info", f"Got Global Username {global_name}")
@@ -51,6 +51,7 @@ def creator(proxie):
     else:
         email = f"{''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(15)))}@gmail.com" 
     password = get_password()
+    token = None
 
 
     # 初期設定Headers
@@ -150,6 +151,7 @@ def creator(proxie):
     print(response.status_code, response.json())
     if response.status_code == 201:
         token = response.json()['token']
+        phone_headers["authorization"] = token
         printl("info", f"Success Create Account {email}:{password}:{token}")
     elif response.status_code == 400:
         printl("info", "Captcha Solving...")
@@ -160,6 +162,7 @@ def creator(proxie):
             response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
             if response.status_code == 200 or response.status_code == 201:
                 token = response.json()['token']
+                phone_headers["authorization"] = token
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
                 if response.status_code == 403:
                     printl("error", f"Generate Locked Token {email}:{password}:{token}")
@@ -167,6 +170,7 @@ def creator(proxie):
                         printl("error", f"Phone Verify Requirement")
                     else:
                         printl("error", f"Reason {response.json()}")
+                        return
                     return
                 elif response.status_code == 200:
                     printl("info", f"Generate UnLocked Token {email}:{password}:{token}")
@@ -174,6 +178,7 @@ def creator(proxie):
                     headers.pop('X-Captcha-Key')
                 else:
                     printl("error", "LOL FAILED TO GENERATE ACCOUNT")
+                    return
             else:
                 return
         else:

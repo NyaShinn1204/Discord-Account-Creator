@@ -37,9 +37,9 @@ def get_session():
     )
     return session
 
-def get_cookies(session):
+def get_cookies(session, proxie):
     try:
-        cookies = dict(session.get("https://discord.com/api/v9/experiments").cookies)
+        cookies = dict(session.get("https://discord.com/register", proxy={"http":f"http://{proxie}"}).cookies)
         cookies["__cf_bm"]="0duPxpWahXQbsel5Mm.XDFj_eHeCKkMo.T6tkBzbIFU-1679837601-0-AbkAwOxGrGl9ZGuOeBGIq4Z+ss0Ob5thYOQuCcKzKPD2xvy4lrAxEuRAF1Kopx5muqAEh2kLBLuED6s8P0iUxfPo+IeQId4AS3ZX76SNC5F59QowBDtRNPCHYLR6+2bBFA=="
         cookies["locale"]="en-US"
         printl("info", f"Got cookies {len(cookies)}")
@@ -61,7 +61,7 @@ def get_fingerprint(session):
             'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Mobile Safari/537.36 Edg/114.0.1823.51',
         }
     try:
-        response = session.get('https://discord.com/api/v9/experiments', headers=headers)
+        response = session.get('https://discord.com/api/v9/experiments?with_guild_experiments=true', headers=headers)
         if response.status_code == 200:
             data = response.json()
             fingerprint = data["fingerprint"]
@@ -81,10 +81,10 @@ def get_buildnum(session):
     build_num = int(text[index:index + 6])
     return build_num
 
-def get_username(session):
+def get_username(session, proxie):
     uncheck_username = ''.join(random.choice(string.ascii_letters + string.digits) for i in range(15)) 
     try:
-        response = session.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", json={"username": uncheck_username})
+        response = session.post("https://discord.com/api/v9/unique-username/username-attempt-unauthed", proxy={"http":f"http://{proxie}"}, json={"username": uncheck_username})
         if response.status_code == 429:
             printl("error", "Rate limitation has now occurred on the request to check user name. Skip check.")
             return uncheck_username
