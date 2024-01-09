@@ -31,18 +31,15 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     response = poipoi_session.post('https://m.kuku.lu/smphone.app.recv.view.php', data={'num':num, 'key':key})
     soup = BeautifulSoup(response.text, 'html.parser')
     verify_redirect_url = soup.find('a', text='\n            Verify Email\n          ').attrs['href']
-    print(verify_redirect_url)
-    response = requests.get(verify_redirect_url, headers=headers, proxies={"http":f"http://{proxie}"})
-    print(response)
+    response = requests.get(verify_redirect_url, headers={'Accept': '*/*','Sec-Ch-Ua-Mobile': '?0','Sec-Ch-Ua-Platform': '"Windows"','Sec-Fetch-Dest': 'empty','Sec-Fetch-Mode': 'cors','Sec-Fetch-Site': 'same-origin','X-Debug-Options': 'bugReporterEnabled','X-Discord-Locale': 'ja','X-Discord-Timezone': 'Asia/Tokyo',}, proxies={"http":f"http://{proxie}"})
     soup = BeautifulSoup(response.text, 'html.parser')
-    print(soup)
     script_element = soup.find('script')
-    print(script_element)
     # verify_urlの取得
     verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
     response = requests.get(verify_url, headers=headers, proxies={"http":f"http://{proxie}"})
     verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
     request_data = {"token": verify_token}
+    print(request_data)
     # Emailの認証
     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies={"http":f"http://{proxie}"}, json=request_data)
     if response.status_code == 200:
