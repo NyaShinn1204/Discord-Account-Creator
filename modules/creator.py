@@ -86,24 +86,21 @@ def creator(proxie):
     # Normal Headers
     ##ここから
     headers = {
-        "Accept": "*/*",
+        "Accept":"*/*",
         "Accept-Encoding": "gzip, deflate, br",
         "Accept-Language": "ja;q=0.7",
         "Connection": "keep-alive",
         "Content-Type": "application/json",
-        "Cookie": cookies,
         "Host": "discord.com",
         "Origin": "https://discord.com",
         "Pragma": "no-cache",
-        "Referer": "https://discord.com/register",
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
         "sec-ch-ua-platform": "Windows",
         "sec-ch-ua-mobile": "?0",
-        "Sec-Ch-Ua": '"Not_A Brand";v="8", "Chromium";v="120", "Brave";v="120"',
+        "sec-ch-ua": "'Not_A Brand';v='8', 'Chromium';v='120', 'Brave';v='120'",
         "TE": "Trailers",
-        #"Sec-Gpc": 1,
         "User-Agent": agent_string,
         "X-Discord-Locale": "ja",
         "X-Discord-Timezone": "Asia/Tokyo",
@@ -154,7 +151,8 @@ def creator(proxie):
     response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
     if response.status_code == 429:
         printl("error", "WTF??? RATELIMITED :skull:")
-    print(response.status_code, response.json())
+    else:
+        print(response.status_code, response.json())
     if response.status_code == 201:
         token = response.json()['token']
         phone_headers["authorization"] = token
@@ -176,8 +174,8 @@ def creator(proxie):
                         printl("error", f"Phone Verify Requirement")
                     else:
                         printl("error", f"Reason {response.json()}")
-                        return
-                    return
+                        #return
+                    #return
                 elif response.status_code == 200:
                     printl("info", f"Generate UnLocked Token {email}:{password}:{token}")
                     headers['Authorization'] = token

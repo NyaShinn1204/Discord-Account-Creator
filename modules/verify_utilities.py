@@ -31,16 +31,20 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     response = poipoi_session.post('https://m.kuku.lu/smphone.app.recv.view.php', data={'num':num, 'key':key})
     soup = BeautifulSoup(response.text, 'html.parser')
     verify_redirect_url = soup.find('a', text='\n            Verify Email\n          ').attrs['href']
-    response = requests.get(verify_redirect_url, headers=headers, proxies=f"http://{proxie}")
+    print(verify_redirect_url)
+    response = requests.get(verify_redirect_url, headers=headers, proxies={"http":f"http://{proxie}"})
+    print(response)
     soup = BeautifulSoup(response.text, 'html.parser')
+    print(soup)
     script_element = soup.find('script')
+    print(script_element)
     # verify_urlの取得
     verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
-    response = requests.get(verify_url, headers=headers, proxies=f"http://{proxie}")
+    response = requests.get(verify_url, headers=headers, proxies={"http":f"http://{proxie}"})
     verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
     request_data = {"token": verify_token}
     # Emailの認証
-    response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies=f"http://{proxie}", json=request_data)
+    response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies={"http":f"http://{proxie}"}, json=request_data)
     if response.status_code == 200:
         token = response.json()['token']
         printl("info", f"Email Verifed {email}:{password}:{token}")
@@ -51,7 +55,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
             captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/verify", proxy_host, proxy_port, proxy_username, proxy_password)
             if captcha_result:
                 headers['X-Captcha-Key'] = captcha_result
-                response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies=f"http://{proxie}")
+                response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies={"http":f"http://{proxie}"})
                 if response.status_code == 200 or response.status_code == 201:
                     printl("info", f"Email Verifed {email}:{password}:{token}")
                     token = response.json()['token']
@@ -78,7 +82,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
         url="https://discord.com/api/v9/users/@me/phone",
         json=data1,
         headers=phone_headers,
-        proxy={"http":f"http://{proxie}"}
+        proxy={"http":{"http":f"http://{proxie}"}}
     )
 
     if "captcha_key" in resp2.json():
@@ -93,7 +97,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
                 url="https://discord.com/api/v9/users/@me/phone",
                 json=data1,
                 headers=phone_headers,
-                proxy={"http":f"http://{proxie}"}
+                proxy={"http":{"http":f"http://{proxie}"}}
             )
     else:
         printl("info", "No Captcha Solving required... Skipping!")
@@ -137,7 +141,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
             url="https://discord.com/api/v9/phone-verifications/verify",
             json=data2,
             headers=phone_headers,
-            proxy={"http":f"http://{proxie}"}
+            proxy={"http":{"http":f"http://{proxie}"}}
         ).json()
         try: phone_token = resp4["token"]
         except KeyError: phone_token = None
@@ -149,7 +153,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
             url="https://discord.com/api/v9/users/@me/phone",
             json=data3,
             headers=phone_headers,
-            proxy={"http":f"http://{proxie}"}
+            proxy={"http":{"http":f"http://{proxie}"}}
         )
 
         printl("info", f'Successfully verified {phone_headers["authorization"]} with {NUMBER}!')
