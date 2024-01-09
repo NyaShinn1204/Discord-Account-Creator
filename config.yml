@@ -12,3 +12,10 @@ email_verify:
     enable: True
     m.kuku.lu_token: "a"
     m.kuku.lu_sessionhash: "a"
+
+# Phone Verify  Coming Soon
+phone_verify:
+    enable: None
+    provider: "5sim.net"  # Now only support 5sim.net
+    apikey: ""
+    country: "russia"
