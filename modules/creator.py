@@ -151,6 +151,7 @@ def creator(proxie):
     response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
     if response.status_code == 429:
         printl("error", "WTF??? RATELIMITED :skull:")
+        return
     else:
         print(response.status_code, response.json())
     if response.status_code == 201:

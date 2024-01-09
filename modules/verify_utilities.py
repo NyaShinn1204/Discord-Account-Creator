@@ -38,6 +38,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
     response = requests.get(verify_url, headers=headers, proxies={"http":f"http://{proxie}"})
     verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
+    print(verify_token)
     request_data = {"token": verify_token}
     print(request_data)
     # Emailの認証
