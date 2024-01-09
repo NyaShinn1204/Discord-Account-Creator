@@ -16,7 +16,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     poipoi_session.cookies.set('cookie_sessionhash', config["email_verify"]["m.kuku.lu_sessionhash"])
     # 未読の指定したメールが来るまで2秒間隔で検索を繰り返す
     while True:
-        response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} Verify Email Address for Discord&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
+        response = poipoi_session.get(f'https://m.kuku.lu/recv._ajax.php?&q={email} メールアドレスを確認してください&csrf_token_check={config["email_verify"]["m.kuku.lu_token"]}')
         soup = BeautifulSoup(response.text, 'html.parser')
         if soup.find('span', attrs={'class':'view_listcnt'}).contents[0] == '1':
             break
