@@ -42,6 +42,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     print(request_data)
     # Emailの認証
     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies={"http":f"http://{proxie}"}, json=request_data)
+    print(response.text, response.json())
     if response.status_code == 200:
         token = response.json()['token']
         printl("info", f"Email Verifed {email}:{password}:{token}")
