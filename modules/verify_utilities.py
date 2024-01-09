@@ -7,6 +7,8 @@ from bs4 import BeautifulSoup
 
 config = yaml.safe_load((open("config.yml", encoding="utf-8")))
 
+temp_header = {'Accept': '*/*','Sec-Ch-Ua-Mobile': '?0','Sec-Ch-Ua-Platform': '"Windows"','Sec-Fetch-Dest': 'empty','Sec-Fetch-Mode': 'cors','Sec-Fetch-Site': 'same-origin','X-Debug-Options': 'bugReporterEnabled','X-Discord-Locale': 'ja','X-Discord-Timezone': 'Asia/Tokyo',}
+
 #Email Verify
 ## 注意: メールを既読してしまうと取得ができてもurlが取得できません
 def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password):
@@ -31,16 +33,14 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     response = poipoi_session.post('https://m.kuku.lu/smphone.app.recv.view.php', data={'num':num, 'key':key})
     soup = BeautifulSoup(response.text, 'html.parser')
     verify_redirect_url = soup.find('a', text='\n            Verify Email\n          ').attrs['href']
-    response = requests.get(verify_redirect_url, headers={'Accept': '*/*','Sec-Ch-Ua-Mobile': '?0','Sec-Ch-Ua-Platform': '"Windows"','Sec-Fetch-Dest': 'empty','Sec-Fetch-Mode': 'cors','Sec-Fetch-Site': 'same-origin','X-Debug-Options': 'bugReporterEnabled','X-Discord-Locale': 'ja','X-Discord-Timezone': 'Asia/Tokyo',}, proxies={"http":f"http://{proxie}"})
+    response = requests.get(verify_redirect_url, headers=temp_header, proxies={"http":f"http://{proxie}"})
     soup = BeautifulSoup(response.text, 'html.parser')
     script_element = soup.find('script')
     # verify_urlの取得
     verify_url = script_element.contents[0].replace('\n', '').replace('\t', '').replace('setTimeout(function(){location.href = "', '').replace('";}, 1);', '')
-    response = requests.get(verify_url, headers=headers, proxies={"http":f"http://{proxie}"})
+    response = requests.get(verify_url, headers=temp_header, proxies={"http":f"http://{proxie}"})
     verify_token = response.request.url.replace('https://discord.com/verify#token=', '')
-    print(verify_token)
     request_data = {"token": verify_token}
-    print(request_data)
     # Emailの認証
     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies={"http":f"http://{proxie}"}, json=request_data)
     print(response.text, response.json())
@@ -56,8 +56,8 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
                 headers['X-Captcha-Key'] = captcha_result
                 response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies={"http":f"http://{proxie}"})
                 if response.status_code == 200 or response.status_code == 201:
-                    printl("info", f"Email Verifed {email}:{password}:{token}")
                     token = response.json()['token']
+                    printl("info", f"Email Verifed {email}:{password}:{token}")
                     headers['Authorization'] = token
                     headers.pop('X-Captcha-Key')
                 else:
