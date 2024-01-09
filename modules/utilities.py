@@ -128,7 +128,9 @@ def get_email(token, sessionhash):
     return email
 
 def get_password():
-    return ''.join(random.choice(string.ascii_letters + string.digits) for i in range(random.randint(15, 20))) 
+    characters = string.ascii_letters + string.digits + string.punctuation
+    result = ''.join(random.choice(characters) for _ in range(random.randint(15, 20)))
+    return result
 
 def format_proxy(data):
     # match_typeの初期設定
