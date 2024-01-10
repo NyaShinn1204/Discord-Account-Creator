@@ -48,8 +48,9 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
         #printl("info", f"Email Verifed {email}:{password}:{token}")
         headers['Authorization'] = token
     elif response.status_code == 400:
+        print(response.status_code, response.json())
         if 'captcha_sitekey' in response.json().keys():
-            printl("info", "Captcha Solving...")
+            printl("info", "Email Captcha Solving...")
             captcha_sitekey = response.json()['captcha_sitekey']
             captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/verify", proxy_host, proxy_port, proxy_username, proxy_password)
             if captcha_result:
