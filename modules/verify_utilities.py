@@ -46,7 +46,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     print(response.text, response.json())
     if response.status_code == 200:
         token = response.json()['token']
-        printl("info", f"Email Verifed {email}:{password}:{token}")
+        #printl("info", f"Email Verifed {email}:{password}:{token}")
         headers['Authorization'] = token
     elif response.status_code == 400:
         if 'captcha_sitekey' in response.json().keys():
@@ -57,7 +57,7 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
                 response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, json=request_data, proxies={"http":f"http://{proxie}"})
                 if response.status_code == 200 or response.status_code == 201:
                     token = response.json()['token']
-                    printl("info", f"Email Verifed {email}:{password}:{token}")
+                    #printl("info", f"Email Verifed {email}:{password}:{token}")
                     headers['Authorization'] = token
                     headers.pop('X-Captcha-Key')
                 else:
@@ -66,6 +66,17 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
                 return
         else:
             return
+    response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
+    if response.status_code == 403:
+        printl("error", f"Generate Email Verify Locked Token {email}:{password}:{token}")
+        if response.json()["message"] == "この操作を行うには、アカウントを認証する必要があります。" and response.json()["code"] == 40002:
+            printl("error", f"Phone Verify Or Email Verify Requirement")
+        else:
+            printl("error", f"Reason {response.json()}")
+            #return
+        #return
+    elif response.status_code == 200:
+        printl("info", f"Generate Email Verify UnLocked Token {email}:{password}:{token}")
         
 #Phone Verify
 def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password):

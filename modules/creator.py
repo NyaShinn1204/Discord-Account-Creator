@@ -171,8 +171,8 @@ def creator(proxie):
                 response = requests.get("https://discordapp.com/api/v6/users/@me/library", headers={"Content-Type": "application/json", "authorization": token})
                 if response.status_code == 403:
                     printl("error", f"Generate Locked Token {email}:{password}:{token}")
-                    if response.json()["message"] == "You need to verify your account in order to perform this action." and response.json()["code"] == 40002:
-                        printl("error", f"Phone Verify Requirement")
+                    if response.json()["message"] == "この操作を行うには、アカウントを認証する必要があります。" and response.json()["code"] == 40002:
+                        printl("error", f"Phone Verify Or Email Verify Requirement")
                     else:
                         printl("error", f"Reason {response.json()}")
                         #return
