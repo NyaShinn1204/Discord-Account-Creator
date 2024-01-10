@@ -43,13 +43,13 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
     request_data = {"token": verify_token}
     # Emailの認証
     response = requests.post('https://discord.com/api/v9/auth/verify', headers=headers, proxies={"http":f"http://{proxie}"}, json=request_data)
-    print(response.text, response.json())
     if response.status_code == 200:
         token = response.json()['token']
         #printl("info", f"Email Verifed {email}:{password}:{token}")
         headers['Authorization'] = token
     elif response.status_code == 400:
         if 'captcha_sitekey' in response.json().keys():
+            printl("info", "Captcha Solving...")
             captcha_sitekey = response.json()['captcha_sitekey']
             captcha_result = solve_captcha(captcha_sitekey, "https://discord.com/verify", proxy_host, proxy_port, proxy_username, proxy_password)
             if captcha_result:
@@ -71,12 +71,17 @@ def verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy
         printl("error", f"Generate Email Verify Locked Token {email}:{password}:{token}")
         if response.json()["message"] == "この操作を行うには、アカウントを認証する必要があります。" and response.json()["code"] == 40002:
             printl("error", f"Phone Verify Or Email Verify Requirement")
+            with open("./output/locked_tokens.txt", mode='a') as f:
+                f.write(token+"\n")
         else:
             printl("error", f"Reason {response.json()}")
             #return
         #return
     elif response.status_code == 200:
         printl("info", f"Generate Email Verify UnLocked Token {email}:{password}:{token}")
+        with open("./output/valid_tokens.txt", mode='a') as f:
+            f.write(token+"\n")
+    return email,password,token
         
 #Phone Verify
 def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password):
@@ -167,6 +172,7 @@ def verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_
         )
 
         printl("info", f'Successfully verified {phone_headers["authorization"]} with {NUMBER}!')
+        return phone_headers["authorization"]
 
     elif VERIFYCODE is None:
         printl("error", "Failed to get verification code! Rerunning...")

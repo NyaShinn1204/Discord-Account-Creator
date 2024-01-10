@@ -193,8 +193,8 @@ def creator(proxie):
     
     #Email Verify
     if config["email_verify"]["enable"] == True:
-        verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
+        req_verify = verify_email(headers, email, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
         
     #Phone Verify
     if config["phone_verify"]["enable"] == True:
-        verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
+        req_verify = verify_phone(phone_headers, password, proxie, proxy_host, proxy_port, proxy_username, proxy_password)
