@@ -1,4 +1,4 @@
-import yaml, random, base64, json, string, requests, time, re
+import yaml, random, base64, json, string, requests, time
 from modules.utilities import get_session, get_cookies, get_fingerprint, get_buildnum, get_username, get_globalname, get_email, get_password, format_proxy
 from modules.captcha_utilities import solve_captcha
 from modules.verify_utilities import verify_email, verify_phone
@@ -88,25 +88,24 @@ def creator(proxie):
     headers = {
         "Accept":"*/*",
         "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "ja;q=0.7",
-        "Connection": "keep-alive",
+        "Accept-Language": "ja;q=0.9",
         "Content-Type": "application/json",
-        "Host": "discord.com",
-        "Origin": "https://discord.com",
-        "Pragma": "no-cache",
+        "Cookie": '; '.join([f'{key}={value}' for key, value in cookies.items()]),
+        "Origin":"https://discord.com",
+        "Referer": "https://discord.com/register",
+        "sec-Ch-Ua": f"'Not_A Brand';v='8', '{browser_data[0]}';v='{browser_data[1]}'",
+        "Sec-Ch-Ua-Mobile": "?0",
+        "Sec-Ch-Ua-Platform": agent_os,
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",
-        "sec-ch-ua-platform": "Windows",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua": "'Not_A Brand';v='8', 'Chromium';v='120', 'Brave';v='120'",
-        "TE": "Trailers",
+        "Sec-Gpc": "1",
         "User-Agent": agent_string,
+        "X-Debug-Options": "bugReporterEnabled",
         "X-Discord-Locale": "ja",
         "X-Discord-Timezone": "Asia/Tokyo",
-        "x-fingerprint": fingerprint,
-        "X-Super-Properties": base64.b64encode(json.dumps(device_info).encode('utf-8')).decode("utf-8"),
-        "X-Debug-Options": "bugReporterEnabled"
+        "X-Fingerprint": fingerprint,
+        "X-Super-Properties": base64.b64encode(json.dumps(device_info).encode('utf-8')).decode("utf-8")
     }
     ##ここまで
     
@@ -147,7 +146,6 @@ def creator(proxie):
         "username": username,
     }
     ##ここまで
-    
     response = session.post('https://discord.com/api/v9/auth/register', headers=headers, proxy={"http":f"http://{proxie}"}, json=payload, cookies=cookies)
     if response.status_code == 429:
         printl("error", "WTF??? RATELIMITED :skull:")
