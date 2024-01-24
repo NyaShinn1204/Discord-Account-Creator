@@ -1,3 +1,8 @@
+## アナウンス
+このコードのほとんどはDiscordによってパッチされました。現在のところ使用することはできませんので、ご自身でツールを作成してください！ 
+## Announce
+Most of this code has been patched by Discord. It is currently not possible to use it, so please make your own tool!  
+
 # Discord-Account-Creator
 作る予定  何年後になるかなｗｗｗ
 
@@ -11,4 +16,4 @@
 - サポートされているSolverサービスが少ない (apikey持ってないから**検証不可**)
 
 ## サポート
-- My discord: nyanyakko005
+~~- My discord: nyanyakko005~~ < EndSupport
